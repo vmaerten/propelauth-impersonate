@@ -1,0 +1,44 @@
+version: '3'
+
+tasks:
+  build:
+    desc: Build impersonate into bin/
+    cmds:
+      - go build -o bin/impersonate .
+
+  install:
+    desc: Install impersonate into GOBIN
+    cmds:
+      - go install .
+
+  lint:
+    desc: Vet the code and check its formatting
+    cmds:
+      - go vet ./...
+      - gofmt -l . | (! grep .)
+
+  run:
+    desc: Run impersonate with the arguments after --, e.g. task run -- -e staging acme
+    interactive: true
+    cmds:
+      - go run . {{.CLI_ARGS}}
+
+  release:snapshot:
+    desc: Build the release archives into dist/ without publishing
+    cmds:
+      - goreleaser release --snapshot --clean
+
+  release:notes:
+    desc: Print the CHANGELOG.md section of VERSION, the body of its GitHub release
+    silent: true
+    requires:
+      vars: [VERSION]
+    vars:
+      CHANGELOG:
+        sh: cat CHANGELOG.md
+      NOTES: '{{range splitList "\n## " .CHANGELOG}}{{if hasPrefix (print $.VERSION " ") .}}{{splitLines . | rest | join "\n" | trim}}{{end}}{{end}}'
+    preconditions:
+      - sh: '{{if .NOTES}}true{{else}}false{{end}}'
+        msg: CHANGELOG.md has no section for {{.VERSION}}
+    cmds:
+      - echo {{shellQuote .NOTES}}

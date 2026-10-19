@@ -1,0 +1,22 @@
+version: 2
+
+builds:
+  - binary: impersonate
+    env:
+      - CGO_ENABLED=0
+    # Chrome is launched through macOS's `open`.
+    goos:
+      - darwin
+    goarch:
+      - amd64
+      - arm64
+
+archives:
+  - formats: [tar.gz]
+    # The default globs (readme*) would also pick readme_test.go.
+    files:
+      - README.md
+      - CHANGELOG.md
+
+checksum:
+  name_template: checksums.txt
