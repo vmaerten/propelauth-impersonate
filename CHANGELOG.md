@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.6.1 - 2026-10-25
+
 ### 🐛 Fixes
 
 - The Raycast extension explains that an `impersonate` older than 0.6.0 lacks the launcher commands, instead of showing its failure to open a terminal.
@@ -9,6 +11,7 @@
 ### 🔧 Changes
 
 - The Raycast extension installs its dependencies with pnpm, which `task raycast:build` and `task raycast:dev` now need.
+- Built with Go 1.27.3 and the latest versions of the Go dependencies.
 
 ## 0.6.0 - 2026-10-25
 
