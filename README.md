@@ -175,7 +175,7 @@ Each step of the TUI is also a command of its own, for a launcher such as the [R
 | ⌘D | Show or hide the disabled and locked users |
 | ⌘K | Copy the organization ID, the user's email or ID |
 
-To install it:
+To install it, with Node.js and pnpm:
 
 - Tinycast: run `task raycast:build`, then install the `raycast/dist` folder with Install Extension, in the Extensions settings.
 - Raycast: run `task raycast:dev` once, which adds it to the development extensions of Raycast.
