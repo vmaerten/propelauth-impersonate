@@ -23,6 +23,21 @@ tasks:
     cmds:
       - go run . {{.CLI_ARGS}}
 
+  raycast:build:
+    desc: Build the Raycast extension into raycast/dist, the folder Tinycast installs
+    dir: raycast
+    cmds:
+      - npm ci
+      - npm run build
+
+  raycast:dev:
+    desc: Run the Raycast extension in development mode, which adds it to Raycast
+    dir: raycast
+    interactive: true
+    cmds:
+      - npm ci
+      - npm run dev
+
   release:snapshot:
     desc: Build the release archives into dist/ without publishing
     cmds:

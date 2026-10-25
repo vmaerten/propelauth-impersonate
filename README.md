@@ -154,7 +154,7 @@ By default, the impersonation runs in a dedicated Chrome profile:
 
 ## Launcher commands
 
-Each step of the TUI is also a command of its own, for a launcher such as Raycast, or a script. The first three print JSON on stdout:
+Each step of the TUI is also a command of its own, for a launcher such as the [Raycast extension](#raycast-and-tinycast), or a script. The first three print JSON on stdout:
 
 | Command | Prints |
 | --- | --- |
@@ -164,6 +164,26 @@ Each step of the TUI is also a command of its own, for a launcher such as Raycas
 | `impersonate open -e <env> <user-id>` | Nothing: it impersonates the user, as picking them in the TUI does. |
 
 `-e` defaults to the `env` setting, `orgs` and `users` take `-p` and `open` takes `--chrome-profile`, as the TUI does. `open --notify` also reports a failure in a macOS notification, for a launcher that does not wait for the command to end. A failure prints its error on stderr and exits with 1.
+
+## Raycast and Tinycast
+
+`raycast/` holds a Raycast extension, which Tinycast runs too. Its Impersonate User command lists the organizations of an environment, picked in the search bar and remembered, then the users of the one picked, and impersonates a user through the [launcher commands](#launcher-commands):
+
+| Key | Action |
+| --- | --- |
+| enter | Show the users of the organization, or impersonate the user |
+| ⌘D | Show or hide the disabled and locked users |
+| ⌘K | Copy the organization ID, the user's email or ID |
+
+To install it:
+
+- Tinycast: run `task raycast:build`, then install the `raycast/dist` folder with Install Extension, in the Extensions settings.
+- Raycast: run `task raycast:dev` once, which adds it to the development extensions of Raycast.
+
+The launcher does not see the shell's `PATH` and environment:
+
+- The extension runs `~/.local/share/mise/shims/impersonate`, which mise installs: change it in the extension's preferences for another install.
+- When `AWS_PROFILE` picks the AWS profile, set it in the config with `impersonate config set profile <profile>`.
 
 ## Shell completion
 
@@ -181,6 +201,8 @@ impersonate completion zsh > "${fpath[1]}/_impersonate"
 | `task run -- <args>` | Runs the tool with the arguments after `--`. |
 | `task lint` | Runs `go vet` and checks the formatting. |
 | `task install` | Runs `go install .`, see the shadowing note in [Install](#install). |
+| `task raycast:build` | Builds the Raycast extension into `raycast/dist`. |
+| `task raycast:dev` | Runs the Raycast extension in development mode. |
 | `task release:notes VERSION=x.y.z` | Prints the changelog section of a version. |
 | `task release:snapshot` | Builds the release archives into `dist/`, without publishing. |
 
