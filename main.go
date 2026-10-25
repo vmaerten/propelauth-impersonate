@@ -14,11 +14,11 @@ import (
 
 // environment is a PropelAuth project, as declared by an [[envs]] table of config.toml.
 type environment struct {
-	Name         string `toml:"name"`
-	AuthHostname string `toml:"auth_hostname"`
+	Name         string `toml:"name" json:"name"`
+	AuthHostname string `toml:"auth_hostname" json:"auth_hostname"`
 	// Secret is the AWS Secrets Manager secret holding the PropelAuth API key.
-	Secret string `toml:"secret"`
-	Color  string `toml:"color"`
+	Secret string `toml:"secret" json:"secret"`
+	Color  string `toml:"color" json:"color"`
 }
 
 // findEnv returns the index of the environment called name, -1 if there is none.
@@ -32,6 +32,12 @@ func envNames(envs []environment) []string {
 		names[i] = env.Name
 	}
 	return names
+}
+
+func completeEnvs(envs []environment) cobra.CompletionFunc {
+	return func(*cobra.Command, []string, string) ([]string, cobra.ShellCompDirective) {
+		return envNames(envs), cobra.ShellCompDirectiveNoFileComp
+	}
 }
 
 func main() {
@@ -53,6 +59,11 @@ secret = "my-staging-secret"`, path)
 
 	root := rootCommand(defaults, settingsErr)
 	root.AddCommand(configCommand(path))
+	root.AddGroup(&cobra.Group{ID: "launcher", Title: "Steps of the TUI, for a launcher such as Raycast:"})
+	for _, cmd := range launcherCommands(defaults, settingsErr) {
+		cmd.GroupID = "launcher"
+		root.AddCommand(cmd)
+	}
 	if root.Execute() != nil {
 		os.Exit(1)
 	}
@@ -81,9 +92,7 @@ func rootCommand(defaults settings, settingsErr error) *cobra.Command {
 	cmd.Flags().IntVar(&perPage, "per-page", defaults.perPage(), "items per page, 0 to fill the terminal")
 	cmd.Flags().BoolVar(&showDisabled, "show-disabled", defaults.ShowDisabled, "list the disabled and locked users, which d toggles in the TUI")
 	cmd.Flags().StringVar(&chromeProfileName, "chrome-profile", defaults.ChromeProfile, "Chrome profile to open the impersonation in, without the automatic click; the dedicated one when empty")
-	_ = cmd.RegisterFlagCompletionFunc("env", func(*cobra.Command, []string, string) ([]string, cobra.ShellCompDirective) {
-		return envNames(defaults.Envs), cobra.ShellCompDirectiveNoFileComp
-	})
+	_ = cmd.RegisterFlagCompletionFunc("env", completeEnvs(defaults.Envs))
 	return cmd
 }
 

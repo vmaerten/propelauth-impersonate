@@ -70,7 +70,7 @@ func (p *propelAuth) usersInOrg(ctx context.Context, orgID string) ([]user, erro
 
 // fetchAll walks every page of a paginated endpoint, whose items sit under field.
 func fetchAll[T any](ctx context.Context, p *propelAuth, path, field string, query url.Values) ([]T, error) {
-	var all []T
+	all := []T{} // [] rather than null in the JSON output
 	query.Set("page_size", "100")
 	for page := 0; ; page++ {
 		query.Set("page_number", strconv.Itoa(page))

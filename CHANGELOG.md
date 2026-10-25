@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### ✨ Features
+
+- `impersonate envs`, `orgs`, `users` and `open` run each step of the TUI on its own, the first three printing JSON, for a launcher such as Raycast or a script.
+
 ## 0.5.0 - 2026-10-19
 
 ### ✨ Features

@@ -152,6 +152,19 @@ By default, the impersonation runs in a dedicated Chrome profile:
 
 `--chrome-profile` (or `chrome_profile`) opens the same page in one of your own Chrome profiles instead, by its name as Chrome shows it (`Work`) or its directory (`Profile 2`). Chrome lets no tool drive a regular profile, so you click Impersonate there yourself. The impersonated session then replaces that profile's own session on the app's auth domain, and stopping the impersonation signs the profile out: the reason why the dedicated profile is the default.
 
+## Launcher commands
+
+Each step of the TUI is also a command of its own, for a launcher such as Raycast, or a script. The first three print JSON on stdout:
+
+| Command | Prints |
+| --- | --- |
+| `impersonate envs` | The environments of the config file, with their `name`, `auth_hostname`, `secret` and `color`. |
+| `impersonate orgs -e <env>` | The organizations of the environment by name, with their `org_id` and `name`. |
+| `impersonate users -e <env> <org-id>` | The users of the organization by email, disabled and locked ones included, with their `user_id`, `email`, `first_name`, `last_name`, `role` in it, `enabled` and `locked`. |
+| `impersonate open -e <env> <user-id>` | Nothing: it impersonates the user, as picking them in the TUI does. |
+
+`-e` defaults to the `env` setting, `orgs` and `users` take `-p` and `open` takes `--chrome-profile`, as the TUI does. `open --notify` also reports a failure in a macOS notification, for a launcher that does not wait for the command to end. A failure prints its error on stderr and exits with 1.
+
 ## Shell completion
 
 `impersonate completion zsh` (or `bash`, `fish`, `powershell`) prints a completion script, which also completes the setting keys and the declared environments. For zsh:
