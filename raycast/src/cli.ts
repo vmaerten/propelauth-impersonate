@@ -50,5 +50,10 @@ function describe(error: unknown): string {
   if (code === "ENOENT") {
     return `No impersonate command at ${binary()}: set its path in the extension's preferences`;
   }
+  // Before 0.6.0, impersonate takes the launcher commands for an organization search, and starts
+  // its TUI without a terminal.
+  if (stderr?.includes("/dev/tty")) {
+    return `${binary()} predates 0.6.0 and its launcher commands: update it, or set a newer one in the extension's preferences`;
+  }
   return stderr?.trim().replace(/^Error: /, "") || message || String(error);
 }
