@@ -1,11 +1,8 @@
 package main
 
 import (
-	"cmp"
 	"context"
 	"fmt"
-	"net/url"
-	"slices"
 	"strings"
 
 	"charm.land/bubbles/v2/key"
@@ -337,18 +334,14 @@ func (m model) status(text string) string {
 func loadOrgs(env environment, awsProfile string) tea.Cmd {
 	return func() tea.Msg {
 		ctx := context.Background()
-		apiKey, err := fetchAPIKey(ctx, env.Secret, awsProfile)
+		client, err := newPropelAuth(ctx, env, awsProfile)
 		if err != nil {
 			return errMsg{err}
 		}
-		client := &propelAuth{hostname: env.AuthHostname, apiKey: apiKey}
 		orgs, err := client.orgs(ctx)
 		if err != nil {
 			return errMsg{err}
 		}
-		slices.SortFunc(orgs, func(a, b org) int {
-			return cmp.Compare(strings.ToLower(a.Name), strings.ToLower(b.Name))
-		})
 		return orgsLoadedMsg{client: client, orgs: orgs}
 	}
 }
@@ -359,20 +352,13 @@ func loadUsers(client *propelAuth, orgID string) tea.Cmd {
 		if err != nil {
 			return errMsg{err}
 		}
-		slices.SortFunc(users, func(a, b user) int { return cmp.Compare(a.Email, b.Email) })
 		return usersLoadedMsg(users)
 	}
 }
 
 func impersonateUser(env environment, u user, chrome chromeProfile) tea.Cmd {
 	return func() tea.Msg {
-		query := url.Values{"user_id": {u.ID}, "auth_url": {env.AuthHostname}}
-		page := "https://app.propelauth.com/impersonate-user?" + query.Encode()
-		open := impersonate
-		if chrome.dir != "" {
-			open = func(ctx context.Context, page string) error { return openInChromeProfile(ctx, chrome, page) }
-		}
-		if err := open(context.Background(), page); err != nil {
+		if err := openImpersonation(context.Background(), env, u.ID, chrome); err != nil {
 			return errMsg{err}
 		}
 		return impersonatedMsg{}

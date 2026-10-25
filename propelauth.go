@@ -1,13 +1,16 @@
 package main
 
 import (
+	"cmp"
 	"context"
 	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
 	"net/url"
+	"slices"
 	"strconv"
+	"strings"
 )
 
 const propelAuthAPI = "https://propelauth-api.com/api/backend/v1"
@@ -34,12 +37,35 @@ type user struct {
 	} `json:"org_id_to_org_info"`
 }
 
-func (p *propelAuth) orgs(ctx context.Context) ([]org, error) {
-	return fetchAll[org](ctx, p, "/org/query", "orgs", url.Values{})
+// newPropelAuth returns a client of env, whose API key it reads from AWS with awsProfile.
+func newPropelAuth(ctx context.Context, env environment, awsProfile string) (*propelAuth, error) {
+	apiKey, err := fetchAPIKey(ctx, env.Secret, awsProfile)
+	if err != nil {
+		return nil, err
+	}
+	return &propelAuth{hostname: env.AuthHostname, apiKey: apiKey}, nil
 }
 
+// orgs lists the organizations by name.
+func (p *propelAuth) orgs(ctx context.Context) ([]org, error) {
+	orgs, err := fetchAll[org](ctx, p, "/org/query", "orgs", url.Values{})
+	if err != nil {
+		return nil, err
+	}
+	slices.SortFunc(orgs, func(a, b org) int {
+		return cmp.Compare(strings.ToLower(a.Name), strings.ToLower(b.Name))
+	})
+	return orgs, nil
+}
+
+// usersInOrg lists the users of an organization by email.
 func (p *propelAuth) usersInOrg(ctx context.Context, orgID string) ([]user, error) {
-	return fetchAll[user](ctx, p, "/user/org/"+orgID, "users", url.Values{"include_orgs": {"true"}})
+	users, err := fetchAll[user](ctx, p, "/user/org/"+orgID, "users", url.Values{"include_orgs": {"true"}})
+	if err != nil {
+		return nil, err
+	}
+	slices.SortFunc(users, func(a, b user) int { return cmp.Compare(a.Email, b.Email) })
+	return users, nil
 }
 
 // fetchAll walks every page of a paginated endpoint, whose items sit under field.

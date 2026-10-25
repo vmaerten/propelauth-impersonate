@@ -5,7 +5,6 @@ package main
 import (
 	"fmt"
 	"os"
-	"path/filepath"
 	"slices"
 	"strings"
 
@@ -92,15 +91,11 @@ func run(o options, chromeProfileName string) error {
 	if o.env != "" && findEnv(o.envs, o.env) < 0 {
 		return fmt.Errorf("unknown environment %q", o.env)
 	}
-	if chromeProfileName != "" {
-		configDir, err := os.UserConfigDir()
-		if err != nil {
-			return err
-		}
-		if o.chrome, err = findChromeProfile(filepath.Join(configDir, "Google", "Chrome", "Local State"), chromeProfileName); err != nil {
-			return err
-		}
+	chrome, err := lookupChromeProfile(chromeProfileName)
+	if err != nil {
+		return err
 	}
+	o.chrome = chrome
 	m := newModel(o)
 	final, err := tea.NewProgram(m).Run()
 	if err != nil {
