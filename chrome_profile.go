@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"path/filepath"
 	"slices"
 	"strconv"
 	"strings"
@@ -17,6 +18,18 @@ type chromeProfile struct {
 	name string
 	// dir is the profile's directory under Chrome's user data, which --profile-directory wants.
 	dir string
+}
+
+// lookupChromeProfile finds the Chrome profile called name, the dedicated one when name is empty.
+func lookupChromeProfile(name string) (chromeProfile, error) {
+	if name == "" {
+		return chromeProfile{}, nil
+	}
+	configDir, err := os.UserConfigDir()
+	if err != nil {
+		return chromeProfile{}, err
+	}
+	return findChromeProfile(filepath.Join(configDir, "Google", "Chrome", "Local State"), name)
 }
 
 // findChromeProfile looks name up, a display name or a directory, in Chrome's Local State file,

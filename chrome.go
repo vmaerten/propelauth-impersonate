@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"net/url"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -21,6 +22,17 @@ const (
 	debugPort   = "9333"
 	debuggerURL = "http://127.0.0.1:" + debugPort
 )
+
+// openImpersonation opens the dashboard page that impersonates userID of env: in the dedicated
+// Chrome, which clicks Impersonate, or in chrome when it is one of the user's own profiles.
+func openImpersonation(ctx context.Context, env environment, userID string, chrome chromeProfile) error {
+	query := url.Values{"user_id": {userID}, "auth_url": {env.AuthHostname}}
+	page := "https://app.propelauth.com/impersonate-user?" + query.Encode()
+	if chrome.dir != "" {
+		return openInChromeProfile(ctx, chrome, page)
+	}
+	return impersonate(ctx, page)
+}
 
 // impersonate opens the dashboard impersonation page in the dedicated Chrome and confirms it.
 // The tab stays open once the program detaches.
