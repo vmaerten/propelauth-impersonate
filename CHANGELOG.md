@@ -5,6 +5,7 @@
 ### ✨ Features
 
 - `impersonate envs`, `orgs`, `users` and `open` run each step of the TUI on its own, the first three printing JSON, for a launcher such as Raycast or a script.
+- A Raycast extension in `raycast/`, which Tinycast runs too, picks an organization and a user from the launcher and impersonates them.
 
 ## 0.5.0 - 2026-10-19
 

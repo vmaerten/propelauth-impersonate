@@ -1,0 +1,42 @@
+{
+  "$schema": "https://www.raycast.com/schemas/extension.json",
+  "name": "propelauth-impersonate",
+  "title": "PropelAuth Impersonate",
+  "description": "Pick a PropelAuth organization, then a user, and impersonate them, with the impersonate command",
+  "icon": "icon.png",
+  "author": "vmaerten",
+  "license": "MIT",
+  "categories": [
+    "Developer Tools"
+  ],
+  "commands": [
+    {
+      "name": "impersonate",
+      "title": "Impersonate User",
+      "description": "Pick an organization, then a user, and impersonate them",
+      "mode": "view"
+    }
+  ],
+  "preferences": [
+    {
+      "name": "binary",
+      "title": "impersonate Command",
+      "description": "Path of the impersonate command: the launcher does not see the shell's PATH",
+      "type": "textfield",
+      "required": false,
+      "default": "~/.local/share/mise/shims/impersonate"
+    }
+  ],
+  "scripts": {
+    "build": "ray build -e dist -o dist",
+    "dev": "ray develop"
+  },
+  "dependencies": {
+    "@raycast/api": "^2.9.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.19.17",
+    "@types/react": "^19.0.10",
+    "typescript": "^5.9.3"
+  }
+}
