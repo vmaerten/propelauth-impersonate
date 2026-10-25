@@ -6,6 +6,10 @@
 
 - The Raycast extension explains that an `impersonate` older than 0.6.0 lacks the launcher commands, instead of showing its failure to open a terminal.
 
+### 🔧 Changes
+
+- The Raycast extension installs its dependencies with pnpm, which `task raycast:build` and `task raycast:dev` now need.
+
 ## 0.6.0 - 2026-10-25
 
 ### ✨ Features
