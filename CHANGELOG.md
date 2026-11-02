@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### ✨ Features
+
+- The Raycast extension shows the organizations and users it last loaded right away, even after a relaunch, while it reloads them.
+
 ## 0.6.1 - 2026-10-25
 
 ### 🐛 Fixes
