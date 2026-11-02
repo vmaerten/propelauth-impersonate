@@ -177,7 +177,7 @@ Each step of the TUI is also a command of its own, for a launcher such as the [R
 
 To install it, with Node.js and pnpm:
 
-- Tinycast: run `task raycast:build`, then install the `raycast/dist` folder with Install Extension, in the Extensions settings.
+- Tinycast: run `task raycast:build`, then install the `raycast/dist` folder with Install Extension, in the Extensions settings. Tinycast copies the folder: after a rebuild, remove the extension and install it again.
 - Raycast: run `task raycast:dev` once, which adds it to the development extensions of Raycast.
 
 The launcher does not see the shell's `PATH` and environment:
