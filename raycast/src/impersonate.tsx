@@ -1,4 +1,5 @@
 import { Action, ActionPanel, Clipboard, Color, Icon, List, LocalStorage, showHUD, showToast, Toast } from "@raycast/api";
+import { useCachedPromise } from "@raycast/utils";
 import { useEffect, useState } from "react";
 import { Env, open, Org, run, User } from "./cli";
 
@@ -117,27 +118,15 @@ async function impersonate(env: Env, user: User) {
 }
 
 // useCLI runs impersonate with args, again when they change, and shows its failure in a toast.
+// The last answer for args shows right away, across launches, while the new one loads.
 function useCLI<T>(args: string[] | undefined, failureTitle: string): { data?: T; isLoading: boolean } {
-  const [state, setState] = useState<{ data?: T; isLoading: boolean }>({ isLoading: true });
-  const key = args?.join("\0");
-  useEffect(() => {
-    if (!args) return;
-    // A previous environment's answer arriving late must not replace the current one.
-    let current = true;
-    setState({ isLoading: true });
-    run<T>(args).then(
-      (data) => current && setState({ data, isLoading: false }),
-      (error) => {
-        if (!current) return;
-        setState({ isLoading: false });
-        showFailure(failureTitle, error);
-      },
-    );
-    return () => {
-      current = false;
-    };
-  }, [key]);
-  return state;
+  const { data, isLoading } = useCachedPromise(run, [args ?? []], {
+    execute: args !== undefined,
+    onError: (error) => {
+      showFailure(failureTitle, error);
+    },
+  });
+  return { data: data as T | undefined, isLoading };
 }
 
 function showFailure(title: string, error: unknown) {
